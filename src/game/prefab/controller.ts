@@ -1,52 +1,60 @@
 import {Game, CursorKeys, Keyboard} from 'phaser';
 
 import Match from './match';
+import Player from './player';
 
 export default class Controller {
     private game: Game;
     private match: Match;
+    private hoa: string;
     private cursors: CursorKeys;
+    hero: Player;
 
-    constructor(game: Game, match: Match) {
+    constructor(game: Game, match: Match, hoa:string = 'home') {
         this.game = game;
         this.match = match;
+        this.hoa = hoa;
+        this.hero = match[hoa].getFirstExists();
 
         this.init();
     }
 
     init() {
         const keyboard = this.game.input.keyboard;
-        const player = this.match.home.getFirstAlive();
-        const ball = this.match.ball;
-        
+
         this.cursors = keyboard.createCursorKeys();
+
         keyboard.addKey(Keyboard.S)
             .onDown.add(
-                () => player.kick(ball)
+                () => this.hero.kick(this.match.ball)
             );
     }
 
     update() {
-        const cursors = this.cursors;
-        const keyboard = this.game.input.keyboard;
-        const player = this.match.home.getFirstAlive();
-        const ball = this.match.ball;
+        const {cursors, match, hoa} = this;
+        const ballBy = this.match.ballBy;
+
+        if (ballBy && ballBy.team === match[hoa]) {
+            this.hero = ballBy;
+        }
+
+        const hero = this.hero;
 
         if (cursors.up.isDown) {
-            player.run();
+            hero.run();
         }
         else {
-            player.stopRun();
+            hero.stopRun();
         }
 
         if (cursors.left.isDown) {
-            player.turnLeft();
+            hero.turnLeft();
         }
         else if (cursors.right.isDown) {
-            player.turnRight();
+            hero.turnRight();
         }
         else {
-            player.stopTurn();
+            hero.stopTurn();
         }
     }
 };
