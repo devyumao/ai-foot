@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "sourceMap": false,
+        "baseUrl": "./",
+        "paths": {
+            "prefab": [
+                "src/game/prefab/index.ts"
+            ]
+        }
+    },
+    "files": [
+        "./node_modules/phaser/typescript/box2d.d.ts",
+        "./node_modules/phaser/typescript/p2.d.ts",
+        "./node_modules/phaser/typescript/phaser.comments.d.ts",
+        "./node_modules/phaser/typescript/pixi.comments.d.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ],
+    "include": [
+        "./src/**/*.ts",
+        "./node_modules/@types/**/*.ts"
+    ],
+    "awesomeTypescriptLoaderOptions": {
+        "useCache": true
+    }
+}
