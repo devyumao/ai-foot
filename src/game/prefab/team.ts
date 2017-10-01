@@ -23,12 +23,12 @@ export default class Team extends Group {
         this.physicsBodyType = Phaser.Physics.ARCADE;
 
         for (let i = 0; i < size; ++i) {
-            this.add(new Player(game, 500, 400 + i * 100, kit));
+            this.add(new Player(game, 500, 400 + i * 100, kit, this));
         }
     }
 
     update() {
-        this.forEach(player => player.update(), this);
+        this.callAll('update', null);
 
         this.setAll('body.immovable', false);
         this.game.physics.arcade.collide(this);
@@ -36,6 +36,6 @@ export default class Team extends Group {
     }
 
     render() {
-        this.forEach(player => player.render(), this);
+        this.callAll('render', null);
     }
 };

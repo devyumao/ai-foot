@@ -1,6 +1,7 @@
 import {Game, Sprite, Timer} from 'phaser';
 
 import Ball from './Ball';
+import Team from './Team';
 
 export default class Player extends Sprite {
     static ANG_VEL: number = 200;
@@ -11,10 +12,13 @@ export default class Player extends Sprite {
         KICKING: 2
     };
     radius: number = 20;
+    team: Team;
     state: number = Player.STATES.OFF_BALL;
 
-    constructor(game: Game, x: number, y: number, texture: string) {
+    constructor(game: Game, x: number, y: number, texture: string, team?: Team) {
         super(game, x, y, texture);
+        
+        this.team = team;
 
         this.init();
     }
@@ -102,6 +106,10 @@ export default class Player extends Sprite {
         this.state = Player.STATES.OFF_BALL;
     }
 
+    beControlling() {
+        this.state = Player.STATES.CONTROLLING;
+    }
+
     getFrontPosition(ball): {x: number, y: number} {
         const {game, rotation, body, x, y} = this;
         const delta = 0
@@ -110,10 +118,6 @@ export default class Player extends Sprite {
             x: x + Math.cos(rotation) * distance,
             y: y + Math.sin(rotation) * distance
         };
-    }
-
-    onColideWithBall() {
-        this.state = Player.STATES.CONTROLLING;
     }
 
     update() {

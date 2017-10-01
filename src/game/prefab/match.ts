@@ -35,25 +35,29 @@ export default class Match {
         home.update();
         ball.update();
 
-        home.forEach(
-            player => {
-                if (!player.isKicking()) {
-                    game.physics.arcade.collide(
-                        player,
-                        ball,
-                        () => {
-                            player.onColideWithBall();
+        home.forEach((player: Player) => {
+            if (!player.isKicking()) {
+                game.physics.arcade.collide(
+                    player,
+                    ball,
+                    () => {
+                        if ((!this.ballBy || player.team !== this.ballBy.team) && player.isOffBall()) {
+                            player.beControlling();
                             this.ballBy = player;
-                            ball.onColideWithPlayer();
                         }
-                    );
-                }
-            },
-            this
-        );
+                    }
+                );
+            }
+        }, this);
 
-        if (this.ballBy && this.ballBy.isControlling()) {
-            ball.moveToPlayerFront(this.ballBy);
+        const ballBy = this.ballBy;
+        if (ballBy) {
+            if (ballBy.isControlling()) {
+                ball.moveToPlayerFront(ballBy);
+            }
+            else {
+                this.ballBy = null;
+            }
         }
     }
 
