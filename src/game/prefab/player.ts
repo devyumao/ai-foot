@@ -7,13 +7,13 @@ export default class Player extends Sprite {
     static ANG_VEL: number = 200;
     static SPEED: number = 160;
     static STATES: any = {
-        OFF_BALL: 0,
-        CONTROLLING: 1,
-        KICKING: 2
+        OFF_BALL: Symbol(),
+        CONTROLLING: Symbol(),
+        KICKING: Symbol()
     };
     radius: number = 20;
     team: Team;
-    state: number = Player.STATES.OFF_BALL;
+    state: symbol = Player.STATES.OFF_BALL;
 
     constructor(game: Game, x: number, y: number, texture: string, team?: Team) {
         super(game, x, y, texture);
@@ -118,6 +118,10 @@ export default class Player extends Sprite {
             x: x + Math.cos(rotation) * distance,
             y: y + Math.sin(rotation) * distance
         };
+    }
+
+    isTeammateWith(player: Player): boolean {
+        return this.team && player.team && this.team === player.team;
     }
 
     update() {

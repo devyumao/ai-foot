@@ -21,27 +21,30 @@ export default class Match {
         this.init();
     }
 
-    init() {
+    private init() {
         const game = this.game;
 
         // FIXME: put into play
         this.ball = new Ball(game, game.width / 2, game.height / 2);
         this.home = new Team(game, 'home-kit', 3);
+        this.away = new Team(game, 'home-kit', 3);
+        
+        this.embattle();
     }
 
-    update() {
-        const {game, home, ball} = this;
+    private embattle() {
+        this.home.embattle(this);
+        this.away.embattle(this);
+    }
 
-        home.update();
-        ball.update();
-
-        home.forEach((player: Player) => {
+    private checkTeamVsBall(team: Team) {
+        team.forEach((player: Player) => {
             if (!player.isKicking()) {
-                game.physics.arcade.collide(
+                this.game.physics.arcade.collide(
                     player,
-                    ball,
+                    this.ball,
                     () => {
-                        if ((!this.ballBy || player.team !== this.ballBy.team) && player.isOffBall()) {
+                        if ((!this.ballBy || !player.isTeammateWith(this.ballBy)) && player.isOffBall()) {
                             player.beControlling();
                             this.ballBy = player;
                         }
@@ -49,6 +52,22 @@ export default class Match {
                 );
             }
         }, this);
+    }
+
+    private checkHomeVsAway() {
+        this.game.physics.arcade.overlap(this.home, this.away);
+    }
+
+    update() {
+        const {home, away, ball} = this;
+
+        home.update();
+        away.update();
+        ball.update();
+
+        this.checkHomeVsAway();
+        this.checkTeamVsBall(home);
+        this.checkTeamVsBall(away);
 
         const ballBy = this.ballBy;
         if (ballBy) {
@@ -64,5 +83,6 @@ export default class Match {
     render() {
         this.ball.render();
         this.home.render();
+        this.away.render();
     }
 };
