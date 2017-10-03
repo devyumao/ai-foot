@@ -25,7 +25,7 @@ export default class PlayState extends State {
     }
 
     render() {
-        // const game = this.game;
         // this.match.render();
+        this.controller.render();
     }
 };

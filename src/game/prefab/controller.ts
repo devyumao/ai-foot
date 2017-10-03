@@ -57,4 +57,8 @@ export default class Controller {
             hero.stopTurn();
         }
     }
+
+    render() {
+        this.game.debug.bodyInfo(this.hero, 20, 20, '#fff');
+    }
 };

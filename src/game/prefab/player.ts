@@ -4,7 +4,7 @@ import Ball from './Ball';
 import Team from './Team';
 
 export default class Player extends Sprite {
-    static ANG_VEL: number = 200;
+    static ANG_VEL: number = 300;
     static SPEED: number = 160;
     static STATES: any = {
         OFF_BALL: Symbol(),
@@ -25,7 +25,6 @@ export default class Player extends Sprite {
 
     private init() {
         this.anchor.set(.5);
-        // this.angle = 90;
 
         const game = this.game;
         game.add.existing(this);
@@ -35,6 +34,7 @@ export default class Player extends Sprite {
         body.setCircle(this.radius);
         body.collideWorldBounds = true;
         body.immovable = true;
+        this.angle = 90;
         // body.allowGravity = false;
         // body.allowRotation = false;
         // body.maxVelocity.set(200);

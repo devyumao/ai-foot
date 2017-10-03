@@ -32,12 +32,12 @@ export default class Team extends Group {
         const baseX = this.isHome(match) ? 500 : this.game.width - 500;
         const baseY = 300;
 
-        // this.forEach((player: Player) => {
-        // }, this);
         this.children.forEach((player: Player, index: number) => {
             player.x = baseX;
             player.y = baseY + index * 100;
         });
+        
+        this.setAll('angle', this.isHome(match) ? 0 : -180);
     }
 
     isHome(match: Match): boolean {
@@ -48,12 +48,16 @@ export default class Team extends Group {
         return this === match.away;
     }
 
+    setImmovable(value: boolean) {
+        this.setAll('body.immovable', value);
+    }
+
     update() {
         this.callAll('update', null);
 
-        this.setAll('body.immovable', false);
+        this.setImmovable(false);
         this.game.physics.arcade.collide(this);
-        this.setAll('body.immovable', true);
+        this.setImmovable(true);
     }
 
     render() {

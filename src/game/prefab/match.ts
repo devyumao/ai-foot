@@ -1,4 +1,4 @@
-import {Game} from 'phaser';
+import {Game, Group} from 'phaser';
 
 import Pitch from './pitch';
 import Team from './team';
@@ -13,6 +13,7 @@ export default class Match {
     ball: Ball;
     homeScore: number = 0;
     awayScore: number = 0;
+    teams: Group;
     ballBy: Player;
 
     constructor(game: Game) {
@@ -27,49 +28,41 @@ export default class Match {
         // FIXME: put into play
         this.ball = new Ball(game, game.width / 2, game.height / 2);
         this.home = new Team(game, 'home-kit', 3);
-        this.away = new Team(game, 'home-kit', 3);
+        this.away = new Team(game, 'away-kit', 3);
+        this.teams = game.add.group();
+        this.teams.addMultiple([this.home, this.away]);
         
         this.embattle();
     }
 
     private embattle() {
-        this.home.embattle(this);
-        this.away.embattle(this);
+        this.teams.callAll('embattle', null, this);
+    }
+
+    private onPlayerCollideBall(player: Player, ball: Ball) {
+        if ((!this.ballBy || !player.isTeammateWith(this.ballBy)) && player.isOffBall()) {
+            player.beControlling();
+            this.ballBy = player;
+        }
+    }
+
+    private checkPlayerVsBall(player: Player) {
+        if (!player.isKicking()) {
+            this.game.physics.arcade.collide(player, this.ball, this.onPlayerCollideBall, null, this);
+        }
     }
 
     private checkTeamVsBall(team: Team) {
-        team.forEach((player: Player) => {
-            if (!player.isKicking()) {
-                this.game.physics.arcade.collide(
-                    player,
-                    this.ball,
-                    () => {
-                        if ((!this.ballBy || !player.isTeammateWith(this.ballBy)) && player.isOffBall()) {
-                            player.beControlling();
-                            this.ballBy = player;
-                        }
-                    }
-                );
-            }
-        }, this);
+        team.forEach(this.checkPlayerVsBall, this);
     }
 
     private checkHomeVsAway() {
-        this.game.physics.arcade.overlap(this.home, this.away);
+        const {game, home, away} = this;
+        game.physics.arcade.collide(home, away);
     }
 
-    update() {
-        const {home, away, ball} = this;
-
-        home.update();
-        away.update();
-        ball.update();
-
-        this.checkHomeVsAway();
-        this.checkTeamVsBall(home);
-        this.checkTeamVsBall(away);
-
-        const ballBy = this.ballBy;
+    private checkBallControlled() {
+        const {ballBy, ball} = this;
         if (ballBy) {
             if (ballBy.isControlling()) {
                 ball.moveToPlayerFront(ballBy);
@@ -78,6 +71,23 @@ export default class Match {
                 this.ballBy = null;
             }
         }
+    }
+
+    update() {
+        const {home, away, ball, teams} = this;
+
+        teams.callAll('update', null);
+        ball.update();
+
+        teams.callAll('setImmovable', null, false);
+        this.checkHomeVsAway();
+        teams.callAll('setImmovable', null, true);
+
+        this.checkTeamVsBall(home);
+        this.checkTeamVsBall(away);
+        
+
+        this.checkBallControlled();
     }
 
     render() {
