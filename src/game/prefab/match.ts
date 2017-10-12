@@ -26,6 +26,7 @@ export default class Match {
         const game = this.game;
 
         // FIXME: put into play
+        this.pitch = new Pitch(game);
         this.ball = new Ball(game, game.width / 2, game.height / 2);
         this.home = new Team(game, 'home-kit', 3);
         this.away = new Team(game, 'away-kit', 3);
@@ -57,8 +58,10 @@ export default class Match {
     }
 
     private checkHomeVsAway() {
-        const {game, home, away} = this;
+        const {game, home, away, teams} = this;
+        teams.callAll('setImmovable', null, false);
         game.physics.arcade.collide(home, away);
+        teams.callAll('setImmovable', null, true);
     }
 
     private checkBallControlled() {
@@ -74,25 +77,25 @@ export default class Match {
     }
 
     update() {
-        const {home, away, ball, teams} = this;
+        const {pitch, home, away, ball, teams} = this;
 
         teams.callAll('update', null);
         ball.update();
 
-        teams.callAll('setImmovable', null, false);
         this.checkHomeVsAway();
-        teams.callAll('setImmovable', null, true);
 
         this.checkTeamVsBall(home);
         this.checkTeamVsBall(away);
-        
 
         this.checkBallControlled();
+
+        pitch.checkBorderVsTeam(home);
+        pitch.checkBorderVsTeam(away);
+        pitch.checkBorderVsBall(ball);
     }
 
     render() {
         this.ball.render();
-        this.home.render();
-        this.away.render();
+        this.teams.callAll('render', null);
     }
 };

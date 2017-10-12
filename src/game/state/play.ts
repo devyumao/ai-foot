@@ -26,6 +26,6 @@ export default class PlayState extends State {
 
     render() {
         // this.match.render();
-        this.controller.render();
+        // this.controller.render();
     }
 };
